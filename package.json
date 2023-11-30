@@ -1,0 +1,27 @@
+{
+  "name": "v-graf",
+  "version": "0.0.1",
+  "description": "A vue draggable html based flowchart lib.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "keywords": [
+    "chart",
+    "vue",
+    "flowchart",
+    "graph"
+  ],
+  "author": "zekun.jin",
+  "license": "ISC",
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "@vue/tsconfig": "^0.4.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.4",
+    "vite-plugin-dts": "^3.6.4",
+    "vitest": "^0.34.6"
+  }
+}
