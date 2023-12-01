@@ -1,10 +1,10 @@
 export const Position = {
-  TOP_LEFT: '',
-  TOP: '',
-  TOP_RIGHT: '',
-  RIGHT: '',
-  BOTTOM_RIGHT: '',
-  BOTTOM: '',
-  BOTTOM_LEFT: '',
-  LEFT: ''
+  TOP_LEFT: 'tl',
+  TOP: 't',
+  TOP_RIGHT: 'tr',
+  RIGHT: 'r',
+  BOTTOM_RIGHT: 'br',
+  BOTTOM: 'b',
+  BOTTOM_LEFT: 'bl',
+  LEFT: 'l'
 }
