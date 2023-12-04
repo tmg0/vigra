@@ -14,9 +14,6 @@ importers:
       '@vue/tsconfig':
         specifier: ^0.4.0
         version: 0.4.0
-      '@vueuse/components':
-        specifier: ^10.6.1
-        version: 10.6.1(vue@3.3.9)
       '@vueuse/core':
         specifier: ^10.6.1
         version: 10.6.1(vue@3.3.9)
@@ -41,6 +38,9 @@ importers:
 
   playgrounds/vite:
     dependencies:
+      nanoid:
+        specifier: ^5.0.4
+        version: 5.0.4
       v-graf:
         specifier: workspace:~
         version: link:../..
@@ -1427,17 +1427,6 @@ packages:
 
   /@vue/tsconfig@0.4.0:
     resolution: {integrity: sha512-CPuIReonid9+zOG/CGTT05FXrPYATEqoDGNrEaqS4hwcw5BUNM2FguC0mOwJD4Jr16UpRVl9N0pY3P+srIbqmg==}
-    dev: true
-
-  /@vueuse/components@10.6.1(vue@3.3.9):
-    resolution: {integrity: sha512-Yx7h201xJG3V4+rY1wRAYy8EI9Q1r+gpwCJzgyZ0CWPyDWyZCxPXNjPhBJsXcSzJ1h1ph9tE5cVqEXHtEs6bjg==}
-    dependencies:
-      '@vueuse/core': 10.6.1(vue@3.3.9)
-      '@vueuse/shared': 10.6.1(vue@3.3.9)
-      vue-demi: 0.14.6(vue@3.3.9)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
     dev: true
 
   /@vueuse/core@10.6.1(vue@3.3.9):
@@ -3174,6 +3163,12 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid@5.0.4:
+    resolution: {integrity: sha512-vAjmBf13gsmhXSgBrtIclinISzFFy22WwCYoyilZlsrRXNIHSwgFQ1bEdjRwMT3aoadeIF6HMuDRlOxzfXV8ig==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    dev: false
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}

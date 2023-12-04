@@ -8,3 +8,5 @@ export const Position = {
   BOTTOM_LEFT: 'bl',
   LEFT: 'l'
 }
+
+export const CANVAS_CONTEXT = '_V_GRAF:CONTEXT'

@@ -9,6 +9,7 @@
     "preview:vite": "vite preview"
   },
   "dependencies": {
+    "nanoid": "^5.0.4",
     "v-graf": "workspace:~",
     "vue": "^3.3.8"
   },
