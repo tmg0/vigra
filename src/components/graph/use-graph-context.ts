@@ -3,6 +3,7 @@ import { GRAPH_CONTEXT } from '../../constants'
 
 interface Context {
   graph: {
+    ref: Ref<HTMLElement | undefined | null >
     bounding: {
       x: Ref<number>
       y: Ref<number>
@@ -12,6 +13,7 @@ interface Context {
 
 const defaults: Context = {
   graph: {
+    ref: ref(),
     bounding: {
       x: ref(0),
       y: ref(0)

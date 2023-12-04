@@ -6,15 +6,17 @@ export const Graph = defineComponent({
   setup (_, { slots }) {
     const domRef = ref()
 
-    const { x, y } = useElementBounding(domRef)
+    const { x, y, width, height } = useElementBounding(domRef)
 
-    useProvideContext({ graph: { bounding: { x, y } } })
+    useProvideContext({ graph: { ref: domRef, bounding: { x, y } } })
 
     return () => (
       <div ref={domRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-        {slots.default?.()}
+        {slots.nodes?.()}
 
-        <svg style={{ position: 'absolute', inset: 0 }} />
+        <svg width={width.value} height={height.value} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          {slots.edges?.()}
+        </svg>
       </div>
     )
   }

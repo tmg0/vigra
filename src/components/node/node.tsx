@@ -1,18 +1,18 @@
-import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
+import { defineComponent, ref, type ExtractPropTypes, type PropType, computed } from 'vue'
 import { useElementHover, useDraggable, useVModel, onClickOutside } from '@vueuse/core'
-
 import { Port } from '../../components/port'
 import { useGraphContext } from '../graph/use-graph-context'
 
 interface PropsPort {
-  position: string
+  position: string[]
 }
 
 const props = {
   as: { type: String as PropType<keyof HTMLElementTagNameMap>, default: 'div' },
   x: { type: Number, default: 0 },
   y: { type: Number, default: 0 },
-  port: { type: Object as PropType<PropsPort>, default: () => ({}) },
+  zIndex: { type: Number, default: 0 },
+  port: { type: Object as PropType<PropsPort>, default: () => ({ position: ['tl', 't', 'tr', 'r', 'br', 'b', 'bl', 'l'] }) },
   draggable: { type: Boolean, default: true },
   isSelected: { type: Boolean, default: false }
 }
@@ -25,19 +25,19 @@ export const Node = defineComponent({
   setup (props, { emit, slots }) {
     const domRef = ref()
     const portsRef = ref()
-    const positionStyle = ref('')
-    const isPressedPort = ref(false)
     const x = useVModel(props, 'x', emit)
     const y = useVModel(props, 'y', emit)
     const isSelected = useVModel(props, 'isSelected', emit)
     const isHovered = useElementHover(portsRef)
     const context = useGraphContext()
 
-    const { style: _s } = useDraggable(domRef, {
+    const { x: _x, y: _y } = useDraggable(domRef, {
       initialValue: {
         x: x.value,
         y: y.value
       },
+
+      containerElement: context.graph.ref.value,
 
       onEnd (position) {
         x.value = position.x
@@ -45,46 +45,30 @@ export const Node = defineComponent({
       }
     })
 
-    watch(_s, (value) => {
-      if (!isPressedPort.value) {
-        positionStyle.value = value
-      }
-    }, { immediate: true })
-
     onClickOutside(domRef, () => { isSelected.value = false })
 
+    const zIndex = computed(() => (props.zIndex + 1) * 10)
+
     const style = computed(() => {
-      if (!props.draggable) { return {} }
-
-      const _r: Record<string, string> = {}
-      const _arr = positionStyle.value.split(';').filter(Boolean)
-      _arr.forEach((item) => {
-        const [k, v] = item.split(':').map(str => str.trim())
-        _r[k] = v
-      })
-
-      _r.left = `${parseInt(_r.left) - context.graph.bounding.x.value}px`
-      _r.top = `${parseInt(_r.top) - context.graph.bounding.y.value}px`
-      return _r
+      const constantStyle = { position: 'absolute', cursor: 'grab' }
+      const dynamicStyle = { left: `${_x.value}px`, top: `${_y.value}px`, zIndex: zIndex.value }
+      return { ...constantStyle, ...dynamicStyle }
     })
 
-    return () => (
-      <props.as ref={domRef} style={{ ...style.value, position: 'absolute', cursor: 'grab' }} onMousedown={() => { isSelected.value = true }}>
-        <div>{`x: ${props.x} / y: ${props.y}`}</div>
+    const onPressPort = (_: string, bounding: { x: number, y: number }) => {
+      console.log(bounding)
+    }
 
+    return () => (
+      <props.as ref={domRef} style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
         {slots.default?.()}
 
-        {isHovered.value}
-
-        <div ref={portsRef} style={{ position: 'absolute', inset: 0, zIndex: 10 }} >
-          <Port visible={isHovered.value} style={{ top: 0, left: 0, transform: 'translate(-50%, -50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ top: 0, left: '50%', transform: 'translate(-50%, -50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ top: 0, right: 0, transform: 'translate(50%, -50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ top: '50%', right: 0, transform: 'translate(50%, -50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ bottom: 0, right: 0, transform: 'translate(50%, 50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ bottom: 0, left: '50%', transform: 'translate(-50%, 50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ bottom: 0, left: 0, transform: 'translate(-50%, 50%)' }} onPress={(value) => { isPressedPort.value = value }} />
-          <Port visible={isHovered.value} style={{ top: '50%', left: 0, transform: 'translate(-50%, -50%)' }} onPress={(value) => { isPressedPort.value = value }} />
+        <div ref={portsRef} style={{ position: 'absolute', inset: 0, zIndex: zIndex.value + 1 }} >
+          {
+            props.port.position.map((p) => {
+              return <Port visible={isHovered.value} zIndex={zIndex.value + 1} position={p} onMousedown={(value) => { onPressPort(p, value) }} />
+            })
+          }
         </div>
       </props.as>
     )
