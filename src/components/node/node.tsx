@@ -22,16 +22,18 @@ export type NodeProps = ExtractPropTypes<typeof props>
 export const Node = defineComponent({
   props,
 
-  setup (props, { emit, slots }) {
+  setup (props, { attrs, emit, slots }) {
     const domRef = ref()
-    const portsRef = ref()
+    const handle = ref()
     const x = useVModel(props, 'x', emit)
     const y = useVModel(props, 'y', emit)
     const isSelected = useVModel(props, 'isSelected', emit)
-    const isHovered = useElementHover(portsRef)
+    const isHovered = useElementHover(domRef)
     const context = useGraphContext()
 
     const { x: _x, y: _y } = useDraggable(domRef, {
+      handle,
+
       initialValue: {
         x: x.value,
         y: y.value
@@ -61,15 +63,13 @@ export const Node = defineComponent({
 
     return () => (
       <props.as ref={domRef} style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
-        {slots.default?.()}
+        <div ref={handle} class={attrs.class}>{slots.default?.()}</div>
 
-        <div ref={portsRef} style={{ position: 'absolute', inset: 0, zIndex: zIndex.value + 1 }} >
-          {
-            props.port.position.map((p) => {
-              return <Port visible={isHovered.value} zIndex={zIndex.value + 1} position={p} onMousedown={(value) => { onPressPort(p, value) }} />
-            })
-          }
-        </div>
+        {
+          props.port.position.map((p) => {
+            return <Port visible={isHovered.value} zIndex={zIndex.value + 1} position={p} onMousedown={(value) => { onPressPort(p, value) }} />
+          })
+        }
       </props.as>
     )
   }

@@ -1,5 +1,5 @@
-import { defineComponent, ref, type ExtractPropTypes, type PropType, computed } from 'vue'
-import { useElementBounding, useElementHover } from '@vueuse/core'
+import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
+import { useElementBounding, useElementHover, useMousePressed } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
 
 interface Bounding {
@@ -21,9 +21,9 @@ export const Port = defineComponent({
 
   setup (props) {
     const domRef = ref()
-    const isPressed = ref(false)
     const { x: _x, y: _y } = useElementBounding(domRef)
     const isHovered = useElementHover(domRef)
+    const { pressed } = useMousePressed({ target: domRef })
     const context = useGraphContext()
 
     const x = computed(() => _x.value - context.graph.bounding.x.value)
@@ -42,16 +42,17 @@ export const Port = defineComponent({
       return {}
     })
 
-    const onMousedown = () => {
-      isPressed.value = true
-      props.onMousedown?.({ x: x.value, y: y.value })
-    }
+    watch(pressed, (value) => {
+      if (value) {
+        props.onMousedown?.({ x: x.value, y: y.value })
+      }
+    })
 
     return () => (
       <div
         ref={domRef}
         style={{
-          display: props.visible || isPressed.value ? 'block' : 'none',
+          display: props.visible || pressed.value ? 'block' : 'none',
           position: 'absolute',
           width: '8px',
           height: '8px',
@@ -61,11 +62,9 @@ export const Port = defineComponent({
           transitionDuration: '300ms',
           transition: 'all',
           background: '#fff',
-          borderColor: isHovered.value || isPressed.value ? '#000' : '#d9d9d9',
+          borderColor: isHovered.value || pressed.value ? '#000' : '#d9d9d9',
           ...style.value
         }}
-        onMousedown={() => { onMousedown() }}
-        onMouseup={() => { isPressed.value = false }}
       />
     )
   }

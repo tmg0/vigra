@@ -40,12 +40,11 @@ const onAdd = () => {
           v-model:y="node.position.y"
           v-model:is-selected="selectedKey[node.key]"
           :z-index="index"
-          class="p-4 border bg-white"
-          :class="{ 'ring-offset-2 ring': selectedKey[node.key] }"
-          @click="selectedKey[node.key] = true"
         >
-          <div>{{ `node_${node.key}` }}</div>
-          <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
+          <div class="p-4 border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
+            <div>{{ `node_${node.key}` }}</div>
+            <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
+          </div>
         </Node>
       </template>
     </Graph>
