@@ -22,7 +22,7 @@ export type NodeProps = ExtractPropTypes<typeof props>
 export const Node = defineComponent({
   props,
 
-  setup (props, { attrs, emit, slots }) {
+  setup (props, { emit, slots }) {
     const domRef = ref()
     const handle = ref()
     const x = useVModel(props, 'x', emit)
@@ -63,7 +63,7 @@ export const Node = defineComponent({
 
     return () => (
       <props.as ref={domRef} style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
-        <div ref={handle} class={attrs.class}>{slots.default?.()}</div>
+        <div ref={handle}>{slots.default?.()}</div>
 
         {
           props.port.position.map((p) => {
