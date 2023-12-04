@@ -9,4 +9,4 @@ export const Position = {
   LEFT: 'l'
 }
 
-export const CANVAS_CONTEXT = '_V_GRAF:CONTEXT'
+export const GRAPH_CONTEXT = '_V_GRAF:CONTEXT'

@@ -1,8 +1,8 @@
 import { inject, provide, ref, type Ref } from 'vue'
-import { CANVAS_CONTEXT } from '../../constants'
+import { GRAPH_CONTEXT } from '../../constants'
 
 interface Context {
-  canvas: {
+  graph: {
     bounding: {
       x: Ref<number>
       y: Ref<number>
@@ -11,7 +11,7 @@ interface Context {
 }
 
 const defaults: Context = {
-  canvas: {
+  graph: {
     bounding: {
       x: ref(0),
       y: ref(0)
@@ -20,9 +20,9 @@ const defaults: Context = {
 }
 
 export const useProvideContext = (context: Context) => {
-  provide(CANVAS_CONTEXT, context)
+  provide(GRAPH_CONTEXT, context)
 }
 
-export const useCanvasContext = () => {
-  return inject<Context>(CANVAS_CONTEXT, defaults)
+export const useGraphContext = () => {
+  return inject<Context>(GRAPH_CONTEXT, defaults)
 }

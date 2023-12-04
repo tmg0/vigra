@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Canvas, Node } from 'v-graf'
+import { Graph, Node } from 'v-graf'
 import { nanoid } from 'nanoid'
 
 interface Position {
@@ -25,7 +25,7 @@ const onAdd = () => {
 
 <template>
   <div class="w-screen h-screen p-6">
-    <Canvas class="border" :style="{ height: '50%' }">
+    <Graph class="border" :style="{ height: '50%' }">
       <Node
         v-for="node in nodes"
         :key="node.key"
@@ -38,7 +38,7 @@ const onAdd = () => {
       >
         {{ `node_${node.key}` }}
       </Node>
-    </Canvas>
+    </Graph>
 
     <button @click="onAdd">
       add node

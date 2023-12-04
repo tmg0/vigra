@@ -2,7 +2,7 @@ import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, w
 import { useElementHover, useDraggable, useVModel, onClickOutside } from '@vueuse/core'
 
 import { Port } from '../../components/port'
-import { useCanvasContext } from '../canvas/use-canvas-context'
+import { useGraphContext } from '../graph/use-graph-context'
 
 interface PropsPort {
   position: string
@@ -31,7 +31,7 @@ export const Node = defineComponent({
     const y = useVModel(props, 'y', emit)
     const isSelected = useVModel(props, 'isSelected', emit)
     const isHovered = useElementHover(portsRef)
-    const context = useCanvasContext()
+    const context = useGraphContext()
 
     const { style: _s } = useDraggable(domRef, {
       initialValue: {
@@ -63,8 +63,8 @@ export const Node = defineComponent({
         _r[k] = v
       })
 
-      _r.left = `${parseInt(_r.left) - context.canvas.bounding.x.value}px`
-      _r.top = `${parseInt(_r.top) - context.canvas.bounding.y.value}px`
+      _r.left = `${parseInt(_r.left) - context.graph.bounding.x.value}px`
+      _r.top = `${parseInt(_r.top) - context.graph.bounding.y.value}px`
       return _r
     })
 
