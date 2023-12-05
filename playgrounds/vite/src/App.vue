@@ -127,7 +127,8 @@ const onLink = (key: string) => {
         </Node>
       </template>
 
-      <template #edges>
+      <template #edges="{ mouse }">
+        <Edge v-if="from.node && from.port && isPressed" :from="portRecords[from.node][from.port]" :to="mouse" color="#00000066" />
         <Edge v-for="edge in edges" :key="edge.key" :from="portRecords[edge.from.node][edge.from.port]" :to="portRecords[edge.to.node][edge.to.port]" />
       </template>
     </Graph>
