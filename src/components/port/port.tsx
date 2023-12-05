@@ -1,17 +1,11 @@
-import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
+import { defineComponent, ref, type ExtractPropTypes, computed, watch } from 'vue'
 import { useElementBounding, useElementHover, useMousePressed } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
-
-interface Bounding {
-  x: number
-  y: number
-}
 
 const props = {
   visible: { type: Boolean, default: false },
   position: { type: String },
-  zIndex: { type: Number, default: 0 },
-  onMousedown: { type: Function as PropType<(value: Bounding) => void> }
+  zIndex: { type: Number, default: 0 }
 }
 
 export type PortProps = ExtractPropTypes<typeof props>
@@ -19,7 +13,7 @@ export type PortProps = ExtractPropTypes<typeof props>
 export const Port = defineComponent({
   props,
 
-  setup (props) {
+  setup (props, { emit }) {
     const domRef = ref()
     const { x: _x, y: _y } = useElementBounding(domRef)
     const isHovered = useElementHover(domRef)
@@ -28,6 +22,14 @@ export const Port = defineComponent({
 
     const x = computed(() => _x.value - context.graph.bounding.x.value)
     const y = computed(() => _y.value - context.graph.bounding.y.value)
+
+    watch(isHovered, (value) => {
+      emit(value ? 'mouseenter' : 'mouseleave', { x: x.value, y: y.value })
+    })
+
+    watch(pressed, (value) => {
+      emit(value ? 'mousedown' : 'mouseup', { x: x.value, y: y.value })
+    })
 
     const style = computed(() => {
       if (props.position === 'tl') { return { top: 0, left: 0, transform: 'translate(-50%, -50%)' } }
@@ -40,12 +42,6 @@ export const Port = defineComponent({
       if (props.position === 'l') { return { top: '50%', left: 0, transform: 'translate(-50%, -50%)' } }
 
       return {}
-    })
-
-    watch(pressed, (value) => {
-      if (value) {
-        props.onMousedown?.({ x: x.value, y: y.value })
-      }
     })
 
     return () => (

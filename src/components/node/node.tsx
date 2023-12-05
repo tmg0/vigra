@@ -1,18 +1,12 @@
-import { defineComponent, ref, type ExtractPropTypes, type PropType, computed } from 'vue'
-import { useElementHover, useDraggable, useVModel, onClickOutside } from '@vueuse/core'
-import { Port } from '../../components/port'
+import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
+import { useElementHover, useDraggable, useVModel, useFocus } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
-
-interface PropsPort {
-  position: string[]
-}
 
 const props = {
   as: { type: String as PropType<keyof HTMLElementTagNameMap>, default: 'div' },
   x: { type: Number, default: 0 },
   y: { type: Number, default: 0 },
   zIndex: { type: Number, default: 0 },
-  port: { type: Object as PropType<PropsPort>, default: () => ({ position: ['tl', 't', 'tr', 'r', 'br', 'b', 'bl', 'l'] }) },
   draggable: { type: Boolean, default: true },
   isSelected: { type: Boolean, default: false }
 }
@@ -30,6 +24,7 @@ export const Node = defineComponent({
     const isSelected = useVModel(props, 'isSelected', emit)
     const isHovered = useElementHover(domRef)
     const context = useGraphContext()
+    const { focused } = useFocus(domRef)
 
     const { x: _x, y: _y } = useDraggable(domRef, {
       handle,
@@ -47,7 +42,14 @@ export const Node = defineComponent({
       }
     })
 
-    onClickOutside(domRef, () => { isSelected.value = false })
+    watch(focused, (value) => {
+      isSelected.value = value
+      emit(value ? 'focus' : 'blur')
+    })
+
+    watch(isHovered, (value) => {
+      emit(value ? 'mouseenter' : 'mouseleave')
+    })
 
     const zIndex = computed(() => (props.zIndex + 1) * 10)
 
@@ -57,19 +59,11 @@ export const Node = defineComponent({
       return { ...constantStyle, ...dynamicStyle }
     })
 
-    const onPressPort = (_: string, bounding: { x: number, y: number }) => {
-      console.log(bounding)
-    }
-
     return () => (
-      <props.as ref={domRef} style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
+      <props.as ref={domRef} tabindex="0" style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
         <div ref={handle}>{slots.default?.()}</div>
 
-        {
-          props.port.position.map((p) => {
-            return <Port visible={isHovered.value} zIndex={zIndex.value + 1} position={p} onMousedown={(value) => { onPressPort(p, value) }} />
-          })
-        }
+        {slots.ports?.({ zIndex: zIndex.value + 1 })}
       </props.as>
     )
   }
