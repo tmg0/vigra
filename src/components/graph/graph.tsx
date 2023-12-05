@@ -1,6 +1,6 @@
 import { useElementBounding } from '@vueuse/core'
 import { defineComponent, ref } from 'vue'
-import { useProvideContext } from './use-graph-context'
+import { useProvideGraphContext } from './use-graph-context'
 
 export const Graph = defineComponent({
   setup (_, { slots }) {
@@ -8,7 +8,7 @@ export const Graph = defineComponent({
 
     const { x, y, width, height } = useElementBounding(domRef)
 
-    useProvideContext({ graph: { ref: domRef, bounding: { x, y } } })
+    useProvideGraphContext({ graph: { ref: domRef, bounding: { x, y } } })
 
     return () => (
       <div ref={domRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>

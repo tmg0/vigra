@@ -21,7 +21,7 @@ const defaults: Context = {
   }
 }
 
-export const useProvideContext = (context: Context) => {
+export const useProvideGraphContext = (context: Context) => {
   provide(GRAPH_CONTEXT, context)
 }
 

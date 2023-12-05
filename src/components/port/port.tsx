@@ -1,10 +1,12 @@
 import { defineComponent, ref, type ExtractPropTypes, computed, watch } from 'vue'
-import { useElementBounding, useElementHover, useMousePressed } from '@vueuse/core'
-import { useGraphContext } from '../graph/use-graph-context'
+import { useElementHover, useMousePressed, useVModel } from '@vueuse/core'
+import { useNodeContext } from '../node/use-node-context'
 
 const props = {
   visible: { type: Boolean, default: false },
   position: { type: String },
+  x: { type: Number, default: 0 },
+  y: { type: Number, default: 0 },
   zIndex: { type: Number, default: 0 }
 }
 
@@ -15,13 +17,32 @@ export const Port = defineComponent({
 
   setup (props, { emit }) {
     const domRef = ref()
-    const { x: _x, y: _y } = useElementBounding(domRef)
+    const propsX = useVModel(props, 'x', emit)
+    const propsY = useVModel(props, 'y', emit)
     const isHovered = useElementHover(domRef)
     const { pressed } = useMousePressed({ target: domRef })
-    const context = useGraphContext()
+    const context = useNodeContext()
 
-    const x = computed(() => _x.value - context.graph.bounding.x.value)
-    const y = computed(() => _y.value - context.graph.bounding.y.value)
+    const asix = computed(() => {
+      if (props.position === 'tl') { return [context.node.bounding.x.value, context.node.bounding.y.value] }
+      if (props.position === 't') { return [context.node.bounding.x.value + context.node.bounding.width.value / 2, context.node.bounding.y.value] }
+      if (props.position === 'tr') { return [context.node.bounding.x.value + context.node.bounding.width.value, context.node.bounding.y.value] }
+      if (props.position === 'r') { return [context.node.bounding.x.value + context.node.bounding.width.value, context.node.bounding.y.value + context.node.bounding.height.value / 2] }
+      if (props.position === 'br') { return [context.node.bounding.x.value + context.node.bounding.width.value, context.node.bounding.y.value + context.node.bounding.height.value] }
+      if (props.position === 'b') { return [context.node.bounding.x.value + context.node.bounding.width.value / 2, context.node.bounding.y.value + context.node.bounding.height.value] }
+      if (props.position === 'bl') { return [context.node.bounding.x.value, context.node.bounding.y.value + context.node.bounding.height.value] }
+      if (props.position === 'l') { return [context.node.bounding.x.value, context.node.bounding.y.value + context.node.bounding.height.value / 2] }
+
+      return [context.node.bounding.x.value + context.node.bounding.width.value / 2, context.node.bounding.y.value + context.node.bounding.height.value / 2]
+    })
+
+    const x = computed(() => asix.value[0])
+    const y = computed(() => asix.value[1])
+
+    watch(asix, (value) => {
+      propsX.value = value[0]
+      propsY.value = value[1]
+    }, { immediate: true })
 
     watch(isHovered, (value) => {
       emit(value ? 'mouseenter' : 'mouseleave', { x: x.value, y: y.value })

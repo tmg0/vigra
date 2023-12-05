@@ -1,6 +1,7 @@
 import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
-import { useElementHover, useDraggable, useVModel, useFocus } from '@vueuse/core'
+import { useElementHover, useDraggable, useVModel, useFocus, useElementBounding } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
+import { useProvideNodeContext } from './use-node-context'
 
 const props = {
   as: { type: String as PropType<keyof HTMLElementTagNameMap>, default: 'div' },
@@ -24,7 +25,10 @@ export const Node = defineComponent({
     const isSelected = useVModel(props, 'isSelected', emit)
     const isHovered = useElementHover(domRef)
     const context = useGraphContext()
+    const { width, height } = useElementBounding(domRef)
     const { focused } = useFocus(domRef)
+
+    useProvideNodeContext({ node: { ref: domRef, bounding: { x, y, width, height } } })
 
     const { x: _x, y: _y } = useDraggable(domRef, {
       handle,
@@ -36,7 +40,7 @@ export const Node = defineComponent({
 
       containerElement: context.graph.ref.value,
 
-      onEnd (position) {
+      onMove (position) {
         x.value = position.x
         y.value = position.y
       }

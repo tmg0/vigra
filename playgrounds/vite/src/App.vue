@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Graph, Node, Port } from 'v-graf'
+import { computed, ref } from 'vue'
+import { Edge, Graph, Node, Port } from 'v-graf'
 import { nanoid } from 'nanoid'
 
 interface Position {
@@ -11,6 +11,8 @@ interface Position {
 interface GrafPort {
   key: string
   position: string
+  x: number
+  y: number
 }
 
 interface GrafNode {
@@ -19,9 +21,15 @@ interface GrafNode {
   ports: GrafPort[]
 }
 
+interface GrafEdgeItem {
+  node: string
+  port: string
+}
+
 interface GrafEdge {
-  from: string
-  to: string
+  key: string
+  from: GrafEdgeItem
+  to: GrafEdgeItem
 }
 
 const NODE_PORTS = ['tl', 't', 'tr', 'r', 'br', 'b', 'bl', 'l']
@@ -32,8 +40,20 @@ const edges = ref<GrafEdge[]>([])
 const isHovered = ref<Record<string, boolean>>({})
 const isPressed = ref(false)
 const isPortHovered = ref(false)
-const from = ref<Position & { key?: string }>({ x: 0, y: 0 })
-const to = ref<Position & { key?: string }>({ x: 0, y: 0 })
+const from = ref<Partial<GrafEdge['from']>>({})
+const to = ref<Partial<GrafEdge['to']>>({})
+
+const portRecords = computed(() => {
+  const r: Record<string, Record<string, GrafPort>> = {}
+  nodes.value.forEach((node) => {
+    const p: Record<string, GrafPort> = {}
+    node.ports.forEach((port) => {
+      p[port.key] = port
+    })
+    r[node.key] = p
+  })
+  return r
+})
 
 const onAdd = () => {
   const key = nanoid()
@@ -43,27 +63,29 @@ const onAdd = () => {
     position: { x: 0, y: 0 },
     ports: NODE_PORTS.map(position => ({
       key: nanoid(),
+      x: 0,
+      y: 0,
       position
     }))
   })
 }
 
-const onPressPort = (key: string, bounding: Position) => {
-  from.value = { key, ...bounding }
+const onPressPort = (node: string, port: string) => {
+  from.value = { node, port }
   isPressed.value = true
 }
 
-const onEnterPort = (key: string, bounding: Position) => {
+const onEnterPort = (node: string, port: string) => {
   if (!isPressed.value) { return }
-  to.value = { key, ...bounding }
-  if (from.value.key !== to.value.key) {
+  to.value = { node, port }
+  if (from.value !== to.value) {
     isPortHovered.value = true
   }
 }
 
 const onLink = (key: string) => {
-  if (isPortHovered.value && from.value.key && to.value.key && key === to.value.key) {
-    edges.value.push({ from: from.value.key, to: to.value.key })
+  if (isPortHovered.value && from.value && to.value && key === to.value.port) {
+    edges.value.push({ key: nanoid(), from: from.value as GrafEdgeItem, to: to.value as GrafEdgeItem })
   }
   isPressed.value = false
 }
@@ -92,21 +114,31 @@ const onLink = (key: string) => {
             <Port
               v-for="port in node.ports"
               :key="port.key"
+              v-model:x="port.x"
+              v-model:y="port.y"
               :visible="isHovered[node.key]"
               :z-index="zIndex"
               :position="port.position"
-              @mousedown="(value: Position) => onPressPort(port.key, value)"
+              @mousedown="onPressPort(node.key, port.key)"
               @mouseup="onLink(port.key)"
-              @mouseenter="(value: Position) => onEnterPort(port.key, value)"
+              @mouseenter="onEnterPort(node.key, port.key)"
             />
           </template>
         </Node>
+      </template>
+
+      <template #edges>
+        <Edge v-for="edge in edges" :key="edge.key" :from="portRecords[edge.from.node][edge.from.port]" :to="portRecords[edge.to.node][edge.to.port]" />
       </template>
     </Graph>
 
     <button @click="onAdd">
       add node
     </button>
+
+    <div>
+      {{ nodes }}
+    </div>
 
     <div>
       {{ edges }}
