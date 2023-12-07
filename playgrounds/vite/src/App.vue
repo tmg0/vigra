@@ -105,7 +105,7 @@ const onLink = (key: string) => {
           @mouseenter="isHovered[node.key] = true"
           @mouseleave="isHovered[node.key] = false"
         >
-          <div class="p-4 border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
+          <div class="p-4 text-xs border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
             <div>{{ `node_${node.key}` }}</div>
             <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
           </div>
@@ -129,17 +129,20 @@ const onLink = (key: string) => {
 
       <template #edges="{ mouse }">
         <Edge v-if="from.node && from.port && isPressed" :from="portRecords[from.node][from.port]" :to="mouse" color="#00000066" />
-        <Edge v-for="edge in edges" :key="edge.key" :from="portRecords[edge.from.node][edge.from.port]" :to="portRecords[edge.to.node][edge.to.port]" />
+
+        <Edge
+          v-for="edge in edges"
+          :key="edge.key"
+          v-model:is-selected="selectedKey[edge.key]"
+          :from="portRecords[edge.from.node][edge.from.port]"
+          :to="portRecords[edge.to.node][edge.to.port]"
+        />
       </template>
     </Graph>
 
     <button @click="onAdd">
       add node
     </button>
-
-    <div>
-      {{ nodes }}
-    </div>
 
     <div>
       {{ edges }}
