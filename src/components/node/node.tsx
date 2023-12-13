@@ -1,5 +1,5 @@
 import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
-import { useElementHover, useDraggable, useVModel, useFocus, useElementBounding } from '@vueuse/core'
+import { useElementHover, useDraggable, useVModel, useFocus, useElementBounding, onClickOutside } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
 import { useProvideNodeContext } from './use-node-context'
 
@@ -21,19 +21,21 @@ export const Node = defineComponent({
 
   setup (props, { emit, slots }) {
     const domRef = ref()
-    const handle = ref()
+    const draggableRef = ref()
     const x = useVModel(props, 'x', emit)
     const y = useVModel(props, 'y', emit)
     const isSelected = useVModel(props, 'isSelected', emit)
     const isHovered = useElementHover(domRef)
     const context = useGraphContext()
     const { width, height } = useElementBounding(domRef)
-    const { focused } = useFocus(domRef)
+    const { focused } = useFocus(draggableRef)
+
+    onClickOutside(draggableRef, () => { isSelected.value = false })
 
     useProvideNodeContext({ node: { ref: domRef, bounding: { x, y, width, height } } })
 
     const { x: _x, y: _y } = useDraggable(domRef, {
-      handle,
+      handle: draggableRef,
 
       initialValue: {
         x: x.value,
@@ -66,8 +68,8 @@ export const Node = defineComponent({
     })
 
     return () => (
-      <props.as ref={domRef} tabindex="0" style={{ ...style.value }} onMousedown={() => { isSelected.value = true }}>
-        <div ref={handle}>{slots.default?.()}</div>
+      <props.as ref={domRef} style={{ ...style.value }}>
+        <div ref={draggableRef} tabindex="0">{slots.default?.()}</div>
 
         {slots.ports?.({ zIndex: zIndex.value + 1 })}
       </props.as>

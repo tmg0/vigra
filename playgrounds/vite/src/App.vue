@@ -89,6 +89,11 @@ const onLink = (key: string) => {
   }
   isPressed.value = false
 }
+
+const onFocus = (index: number) => {
+  const [item] = nodes.value.splice(index, 1)
+  nodes.value.push(item)
+}
 </script>
 
 <template>
@@ -101,6 +106,7 @@ const onLink = (key: string) => {
         v-model:y="node.position.y"
         v-model:is-selected="selectedKey[node.key]"
         :z-index="index"
+        @focus="onFocus(index)"
         @mouseenter="isHovered[node.key] = true"
         @mouseleave="isHovered[node.key] = false"
       >
