@@ -15,6 +15,8 @@ const props = {
 export type NodeProps = ExtractPropTypes<typeof props>
 
 export const Node = defineComponent({
+  name: 'Node',
+
   props,
 
   setup (props, { emit, slots }) {

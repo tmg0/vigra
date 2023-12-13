@@ -14,6 +14,8 @@ const props = {
 }
 
 export const Edge = defineComponent({
+  name: 'Edge',
+
   props,
 
   setup (props, { emit }) {

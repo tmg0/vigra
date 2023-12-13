@@ -2,19 +2,31 @@ import { useElementBounding, useMouse } from '@vueuse/core'
 import { computed, defineComponent, ref } from 'vue'
 import { pickChildren } from '../../utils/vue'
 import { Node } from '../node'
+import { Edge } from '../edge'
 import { useProvideGraphContext } from './use-graph-context'
 
 export const Graph = defineComponent({
   setup (_, { slots }) {
     const domRef = ref()
 
-    const mouse = useMouse()
+    const _mouse = useMouse()
     const { x, y, width, height } = useElementBounding(domRef)
+
+    const mouse = computed(() => ({
+      x: _mouse.x.value - x.value,
+      y: _mouse.y.value - y.value
+    }))
 
     const nodes = computed(() => {
       const [_, n] = pickChildren(slots.default?.(), Node)
       if (!n) { return [] }
       return n
+    })
+
+    const edges = computed(() => {
+      const [_, e] = pickChildren(slots.default?.(), Edge)
+      if (!e) { return [] }
+      return e.map(({ props }) => <Edge to={{ x: mouse.value.x, y: mouse.value.y }} {...props} />)
     })
 
     useProvideGraphContext({ graph: { ref: domRef, bounding: { x, y } } })
@@ -24,7 +36,7 @@ export const Graph = defineComponent({
         {nodes.value}
 
         <svg width={width.value} height={height.value} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          {slots.edges?.({ mouse: { x: mouse.x.value - x.value, y: mouse.y.value - y.value }, x: x.value, y: y.value })}
+          {edges.value}
         </svg>
       </div>
     )
