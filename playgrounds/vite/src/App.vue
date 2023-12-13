@@ -94,38 +94,36 @@ const onLink = (key: string) => {
 <template>
   <div class="w-screen h-screen p-6 flex flex-col gap-6 items-start">
     <Graph class="border bg-black/5" :style="{ height: '75%' }">
-      <template #nodes>
-        <Node
-          v-for="(node, index) in nodes"
-          :key="node.key"
-          v-model:x="node.position.x"
-          v-model:y="node.position.y"
-          v-model:is-selected="selectedKey[node.key]"
-          :z-index="index"
-          @mouseenter="isHovered[node.key] = true"
-          @mouseleave="isHovered[node.key] = false"
-        >
-          <div class="p-4 text-xs border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
-            <div>{{ `node_${node.key}` }}</div>
-            <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
-          </div>
+      <Node
+        v-for="(node, index) in nodes"
+        :key="node.key"
+        v-model:x="node.position.x"
+        v-model:y="node.position.y"
+        v-model:is-selected="selectedKey[node.key]"
+        :z-index="index"
+        @mouseenter="isHovered[node.key] = true"
+        @mouseleave="isHovered[node.key] = false"
+      >
+        <div class="p-4 text-xs border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
+          <div>{{ `node_${node.key}` }}</div>
+          <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
+        </div>
 
-          <template #ports="{ zIndex }">
-            <Port
-              v-for="port in node.ports"
-              :key="port.key"
-              v-model:x="port.x"
-              v-model:y="port.y"
-              :visible="isHovered[node.key]"
-              :z-index="zIndex"
-              :position="port.position"
-              @mousedown="onPressPort(node.key, port.key)"
-              @mouseup="onLink(port.key)"
-              @mouseenter="onEnterPort(node.key, port.key)"
-            />
-          </template>
-        </Node>
-      </template>
+        <template #ports="{ zIndex }">
+          <Port
+            v-for="port in node.ports"
+            :key="port.key"
+            v-model:x="port.x"
+            v-model:y="port.y"
+            :visible="isHovered[node.key]"
+            :z-index="zIndex"
+            :position="port.position"
+            @mousedown="onPressPort(node.key, port.key)"
+            @mouseup="onLink(port.key)"
+            @mouseenter="onEnterPort(node.key, port.key)"
+          />
+        </template>
+      </Node>
 
       <template #edges="{ mouse }">
         <Edge v-if="from.node && from.port && isPressed" :from="portRecords[from.node][from.port]" :to="mouse" color="#00000066" />

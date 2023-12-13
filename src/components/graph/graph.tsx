@@ -1,5 +1,7 @@
 import { useElementBounding, useMouse } from '@vueuse/core'
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
+import { pickChildren } from '../../utils/vue'
+import { Node } from '../node'
 import { useProvideGraphContext } from './use-graph-context'
 
 export const Graph = defineComponent({
@@ -9,11 +11,17 @@ export const Graph = defineComponent({
     const mouse = useMouse()
     const { x, y, width, height } = useElementBounding(domRef)
 
+    const nodes = computed(() => {
+      const [_, n] = pickChildren(slots.default?.(), Node)
+      if (!n) { return [] }
+      return n
+    })
+
     useProvideGraphContext({ graph: { ref: domRef, bounding: { x, y } } })
 
     return () => (
       <div ref={domRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-        {slots.nodes?.()}
+        {nodes.value}
 
         <svg width={width.value} height={height.value} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           {slots.edges?.({ mouse: { x: mouse.x.value - x.value, y: mouse.y.value - y.value }, x: x.value, y: y.value })}
