@@ -1,9 +1,11 @@
 import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
-import { useElementHover, useDraggable, useVModel, useFocus, useElementBounding, onClickOutside } from '@vueuse/core'
+import { useElementHover, useDraggable, useVModel, useElementBounding, useFocus } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
 import { useProvideNodeContext } from './use-node-context'
 
 const props = {
+  id: { type: [String, Number], required: true },
+  parent: { type: [String, Number], default: undefined },
   as: { type: String as PropType<keyof HTMLElementTagNameMap>, default: 'div' },
   x: { type: Number, default: 0 },
   y: { type: Number, default: 0 },
@@ -29,8 +31,6 @@ export const Node = defineComponent({
     const context = useGraphContext()
     const { width, height } = useElementBounding(domRef)
     const { focused } = useFocus(draggableRef)
-
-    onClickOutside(draggableRef, () => { isSelected.value = false })
 
     useProvideNodeContext({ node: { ref: domRef, bounding: { x, y, width, height } } })
 

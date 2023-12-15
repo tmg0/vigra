@@ -101,6 +101,7 @@ const onFocus = (index: number) => {
     <Graph class="border bg-black/5" :style="{ height: '75%' }">
       <Node
         v-for="(node, index) in nodes"
+        :id="node.key"
         :key="node.key"
         v-model:x="node.position.x"
         v-model:y="node.position.y"
