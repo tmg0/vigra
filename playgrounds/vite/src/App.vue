@@ -111,7 +111,7 @@ const onFocus = (index: number) => {
         @mouseenter="isHovered[node.key] = true"
         @mouseleave="isHovered[node.key] = false"
       >
-        <div class="p-4 text-xs border select-none bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
+        <div class="p-4 text-xs border bg-white" :class="{ 'ring-offset-2 ring': selectedKey[node.key] }">
           <div>{{ `node_${node.key}` }}</div>
           <div>{{ `x: ${node.position.x} / y: ${node.position.y}` }}</div>
         </div>
@@ -148,7 +148,6 @@ const onFocus = (index: number) => {
     </button>
 
     <div>
-      {{ !!(from.node && from.port && isPressed) }}
       {{ edges }}
     </div>
   </div>

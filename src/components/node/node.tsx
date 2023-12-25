@@ -1,5 +1,5 @@
 import { defineComponent, ref, type ExtractPropTypes, type PropType, computed, watch } from 'vue'
-import { useElementHover, useDraggable, useVModel, useElementBounding, useFocus } from '@vueuse/core'
+import { useElementHover, useDraggable, useVModel, useElementBounding, useFocusWithin, watchThrottled } from '@vueuse/core'
 import { useGraphContext } from '../graph/use-graph-context'
 import { useProvideNodeContext } from './use-node-context'
 
@@ -30,7 +30,7 @@ export const Node = defineComponent({
     const isHovered = useElementHover(domRef)
     const context = useGraphContext()
     const { width, height } = useElementBounding(domRef)
-    const { focused } = useFocus(draggableRef)
+    const { focused } = useFocusWithin(draggableRef)
 
     useProvideNodeContext({ node: { ref: domRef, bounding: { x, y, width, height } } })
 
